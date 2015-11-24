@@ -46,9 +46,9 @@ public class MyCrawler extends WebCrawler {
      public void visit(Page page) {
     	 i++;
          String url = page.getWebURL().getURL();
-         System.out.println("URL: " + url + " i = " + i);
-
-         if (page.getParseData() instanceof HtmlParseData) {
+         logger.debug("Docid: {}", page.getWebURL().getDocid());
+         	
+         if (page.getParseData() instanceof HtmlParseData) {        	 
              HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();             
              String text = htmlParseData.getText();
              String html = htmlParseData.getHtml();
