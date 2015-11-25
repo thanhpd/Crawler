@@ -1,24 +1,19 @@
 package crawler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias("configuration")
 public class Property {
 	private String serverHost;
 	private String port;
 	private String core;
 	private String solrPath;
 	private String crawlStorageFolder;
-	private int numberOfCrawlers;
-	private List<Integer> maxPagesToFetch = new ArrayList<>();
-	private List<Integer> delay = new ArrayList<>();
-	private List<Integer> concurrentThreads = new ArrayList<>();
-	private List<Integer> maxDepth = new ArrayList<>();
-	private List<Boolean> isIncludeBinary = new ArrayList<>();
-	private List<String> individualFolder = new ArrayList<>();
-	private List<String> crawlersDomain = new ArrayList<>();
-	private List<String> domainSeeders = new ArrayList<>();
+	private int numberOfCrawler;
+	public List<Crawler> crawlers = new ArrayList();
 	
 	public Property() {
 		
@@ -59,44 +54,7 @@ public class Property {
 	}
 	
 	public void setNumberOfCrawlers(String numberOfCrawlers) {
-		this.numberOfCrawlers = Integer.parseInt(numberOfCrawlers);
-	}
-	
-	public void setMaxPagesToFetch(String input) {		
-		List<String> result = Arrays.asList(input.split("|"));
-		for(String s : result) this.maxPagesToFetch.add(Integer.parseInt(s));
-	}
-	
-	public void setDelay(String input) {
-		List<String> result = Arrays.asList(input.split("|"));
-		for(String s : result) this.delay.add(Integer.parseInt(s));
-	}
-	
-	public void setConcurrentThreads(String input) {
-		List<String> result = Arrays.asList(input.split("|"));
-		for(String s : result) this.concurrentThreads.add(Integer.parseInt(s));
-	}
-	
-	public void setMaxDepth(String input) {
-		List<String> result = Arrays.asList(input.split("|"));
-		for(String s : result) this.maxDepth.add(Integer.parseInt(s));
-	}
-	
-	public void setIncludeBinary(String input) {
-		List<String> result = Arrays.asList(input.split("|"));
-		for(String s : result) this.maxDepth.add(Integer.parseInt(s));
-	}
-	
-	public void setIndividualFolder(String input) {
-		this.individualFolder = Arrays.asList(input.split("|"));		
-	}
-	
-	public void setCrawlersDomain(String input) {
-		this.crawlersDomain = Arrays.asList(input.split("|"));
-	}
-	
-	public void setDomainSeeders(String input) {
-		this.domainSeeders = Arrays.asList(input.split("|"));
+		this.numberOfCrawler = Integer.parseInt(numberOfCrawlers);
 	}
 	
 	public String getServerHost() {
@@ -115,37 +73,16 @@ public class Property {
 		return this.solrPath;
 	}
 	
-	public String getFullServerHost() {
-		String result = "http://" + serverHost + ":" + port + "/" + solrPath + "/" + core;
-		return result;
-	}
-	
 	public String getStorageFolder() {
 		return this.crawlStorageFolder;
 	}
 	
 	public int getNumberOfCrawlers() {
-		return this.numberOfCrawlers;
+		return this.numberOfCrawler;
 	}
 	
-	public List<Integer> getMaxPagesToFetch() {
-		return this.maxPagesToFetch;
+	public String getFullServerHost() {
+		String result = "http://" + serverHost + ":" + port + "/" + solrPath + "/" + core;
+		return result;
 	}
-	
-	public List<Integer> getDelay() {
-		return this.delay;		
-	}
-	
-	public List<Integer> getConcurrentThreads() {
-		return this.concurrentThreads;
-	}
-	
-	public List<Integer> getMaxDepth() {
-		return this.maxDepth;
-	}
-	
-	public List<String> getIndividualFolder() {
-		return this.individualFolder;
-	}
-	
 }

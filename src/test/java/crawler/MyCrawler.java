@@ -20,7 +20,12 @@ public class MyCrawler extends WebCrawler {
     public static int getCounter(){
     	return i;
     }
-    
+    private String[] myCrawlDomains;
+
+    @Override
+    public void onStart() {
+      myCrawlDomains = (String[]) myController.getCustomData();
+    }
     /**
      * This method receives two parameters. The first parameter is the page
      * in which we have discovered this new url and the second parameter is
@@ -33,9 +38,18 @@ public class MyCrawler extends WebCrawler {
      */
      @Override
      public boolean shouldVisit(Page referringPage, WebURL url) {
-         String href = url.getURL().toLowerCase();
-         return !FILTERS.matcher(href).matches()
-                && href.startsWith("http://www.ics.uci.edu");                      
+    	 String href = url.getURL().toLowerCase();
+    	    if (FILTERS.matcher(href).matches()) {
+    	      return false;
+    	    }
+
+    	    for (String crawlDomain : myCrawlDomains) {
+    	      if (href.startsWith(crawlDomain)) {
+    	        return true;
+    	      }
+    	    }
+
+    	    return false;                  
      }
 
      /**
@@ -45,9 +59,14 @@ public class MyCrawler extends WebCrawler {
      @Override
      public void visit(Page page) {
     	 i++;
-         String url = page.getWebURL().getURL();
+    	 int docid = page.getWebURL().getDocid();
+    	 String url = page.getWebURL().getURL();
+    	 int parentDocid = page.getWebURL().getParentDocid();
+         
          logger.debug("Docid: {}", page.getWebURL().getDocid());
-         	
+         logger.info("URL: {}", url);
+         logger.debug("Docid of parent page: {}", parentDocid);
+         
          if (page.getParseData() instanceof HtmlParseData) {        	 
              HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();             
              String text = htmlParseData.getText();

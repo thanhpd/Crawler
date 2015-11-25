@@ -1,35 +1,32 @@
 package crawler;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class ConfigHandler {
 	private static ConfigHandler instance = null;
 	
 	private ConfigHandler() {
-		createConfigFile();
+		
 	}
 	
 	public static ConfigHandler getInstance() {
 		if(instance == null) instance = new ConfigHandler();	
-		createConfigFile();
+		createConfigFile();		
 		return instance;
+	}
+	
+	public Property getConfigInfo() {
+		return getProperty();
 	}
 	
 	private static void createConfigFile() {
@@ -183,34 +180,89 @@ public class ConfigHandler {
 	}
 	
 	public Property getProperty() {
-		Properties prop = new Properties();
-		InputStream input = null;
-		Property customProp = new Property();
-		try {
-
-			input = new FileInputStream("config.properties");
-
-			// load a properties file
-			prop.load(input);
-
-			// get the property value and print it out
-			String host = prop.getProperty("host");
-			String port = prop.getProperty("port");
-			String core = prop.getProperty("core");
-			String solrPath = prop.getProperty("solrPath");		
-			customProp.setProperty(host, port, core, solrPath);			
-
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return customProp;
+		Property prop = new Property();
+		try {	
+	         File inputFile = new File("config.xml");
+	         DocumentBuilderFactory dbFactory 
+	            = DocumentBuilderFactory.newInstance();
+	         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	         Document doc = dBuilder.parse(inputFile);
+	         doc.getDocumentElement().normalize();
+	         
+	         NodeList serverHost = doc.getElementsByTagName("serverHost");
+	         prop.setServerHost(serverHost.item(0).getTextContent());
+	         
+	         NodeList port = doc.getElementsByTagName("port");
+	         prop.setPort(port.item(0).getTextContent());
+	         
+	         NodeList core = doc.getElementsByTagName("core");
+	         prop.setCore(core.item(0).getTextContent());
+	         
+	         NodeList solrPath = doc.getElementsByTagName("solrPath");
+	         prop.setSolrPath(solrPath.item(0).getTextContent());
+	         
+	         NodeList storage = doc.getElementsByTagName("crawlStorageFolder");
+	         prop.setStorageFolder(storage.item(0).getTextContent());
+	         
+	         NodeList numberOfCrawler = doc.getElementsByTagName("numberOfCrawler");	         
+	         prop.setNumberOfCrawlers(numberOfCrawler.item(0).getTextContent());
+	         
+	         NodeList nList = doc.getElementsByTagName("crawler");
+	         System.out.println("----------------------------");
+	         for (int temp = 0; temp < nList.getLength(); temp++) {
+	            Node nNode = nList.item(temp);
+	            System.out.println("\nCurrent Element :" 
+	               + nNode.getNodeName());
+	            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+	                Element eElement = (Element) nNode;
+	                int maxPagesToFetch = Integer.parseInt(eElement.getElementsByTagName("maxPagesToFetch").item(0).getTextContent());
+	            	int delay = Integer.parseInt(eElement.getElementsByTagName("delay").item(0).getTextContent());
+	            	int concurrentThreads = Integer.parseInt(eElement.getElementsByTagName("concurrentThreads").item(0).getTextContent());
+	            	int maxDepth = Integer.parseInt(eElement.getElementsByTagName("maxDepth").item(0).getTextContent());
+	            	int maxTimeoutConnection = Integer.parseInt(eElement.getElementsByTagName("maxTimeoutConnection").item(0).getTextContent());
+	            	int maxTimeoutSocket = Integer.parseInt(eElement.getElementsByTagName("maxTimeoutSocket").item(0).getTextContent());
+	            	boolean isIncludeBinary = Integer.parseInt(eElement.getElementsByTagName("includeBinary").item(0).getTextContent()) == 1;
+	            	String individualFolder = eElement.getElementsByTagName("individualFolder").item(0).getTextContent();
+	            	NodeList domainResult = eElement.getElementsByTagName("domain");
+	            	NodeList seedersResult = eElement.getElementsByTagName("seeder");
+	            	
+	            	List<String> domainSeeders = new ArrayList<>();
+	            	List<String> crawlersDomain = new ArrayList<>();
+	            	
+	            	for(int k = 0; k < domainResult.getLength(); k++) {
+	            		Node node = domainResult.item(k);
+	            		domainSeeders.add(node.getTextContent());
+	            	}
+	            	
+	            	for(int k = 0; k < seedersResult.getLength(); k++) {
+	            		Node node = seedersResult.item(k);
+	            		crawlersDomain.add(node.getTextContent());
+	            	}
+//	            	for(int k = 0; k < crawlersDomainResult.getLength(); k++) {
+//	            		Node item = crawlersDomainResult.item(k);
+//	            		if(item.getNodeType() == Node.ELEMENT_NODE) {
+//	            			Element element = (Element) item;
+//	            		}
+//	            	}
+	            	
+	            	Crawler crawl = new Crawler();
+	            	crawl.setMaxPagesToFetch(maxPagesToFetch);
+	            	crawl.setDelay(delay);
+	            	crawl.setMaxDepth(maxDepth);
+	            	crawl.setConcurrentThreads(concurrentThreads);
+	            	crawl.setMaxTimeoutConnection(maxTimeoutConnection);
+	            	crawl.setMaxTimeoutSocket(maxTimeoutSocket);
+	            	crawl.setIncludeBinary(isIncludeBinary);
+	            	crawl.setIndividualFolder(individualFolder);	            		            	
+	            	crawl.setDomainSeeders(domainSeeders);
+	            	crawl.setCrawlersDomain(crawlersDomain);
+	            	
+	            	prop.crawlers.add(crawl);
+	             }
+	         }
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }	   		
+		return prop;
 	}	
 }

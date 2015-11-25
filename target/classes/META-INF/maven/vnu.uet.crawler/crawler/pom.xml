@@ -80,7 +80,13 @@
 
 	<dependencies>
 
-    <!-- Compile time Dependencies -->            
+    <!-- Compile time Dependencies -->
+    <dependency>
+		<groupId>com.thoughtworks.xstream</groupId>
+		<artifactId>xstream</artifactId>
+		<version>1.4.8</version>
+	</dependency>
+                    
     <dependency>
 	    <groupId>org.apache.solr</groupId>
 	    <artifactId>solr-core</artifactId>
