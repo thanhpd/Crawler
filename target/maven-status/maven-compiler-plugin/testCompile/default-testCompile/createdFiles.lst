@@ -1,0 +1,11 @@
+helper\Util.class
+helper\ConfigWriter.class
+crawler\Controller.class
+crawler\MyCrawler.class
+crawler\SolrDocument.class
+crawler\RawDocument.class
+helper\ConfigReader.class
+helper\Crawler.class
+helper\ConfigHandler.class
+helper\Property.class
+crawler\SolrjPopulator.class

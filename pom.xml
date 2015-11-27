@@ -25,7 +25,7 @@
 						<exclude>**/*.properties</exclude>
 					</excludes>
 				</configuration>
-			</plugin>
+			</plugin>			
 			<!-- generate a source jar -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
